@@ -95,11 +95,11 @@ $.extend( $.fn, {
 	},
 
 	// http://jqueryvalidation.org/valid/
-	valid: function() {
+	valid: function( silent ) {
 		var valid, validator, errorList;
 
 		if ( $( this[ 0 ] ).is( "form" ) ) {
-			valid = this.validate().form();
+			valid = this.validate().form( silent );
 		} else {
 			errorList = [];
 			valid = true;
@@ -415,8 +415,13 @@ $.extend( $.validator, {
 		},
 
 		// http://jqueryvalidation.org/Validator.form/
-		form: function() {
-			this.checkForm();
+		form: function( silent ) {
+			this.checkForm( silent );
+
+      if ( silent ) {
+        return this.valid();
+      }
+
 			$.extend( this.submitted, this.errorMap );
 			this.invalid = $.extend( {}, this.errorMap );
 			if ( !this.valid() ) {
@@ -426,10 +431,10 @@ $.extend( $.validator, {
 			return this.valid();
 		},
 
-		checkForm: function() {
+		checkForm: function( silent ) {
 			this.prepareForm();
 			for ( var i = 0, elements = ( this.currentElements = this.elements() ); elements[ i ]; i++ ) {
-				this.check( elements[ i ] );
+				this.check( elements[ i ], silent );
 			}
 			return this.valid();
 		},
@@ -708,7 +713,7 @@ $.extend( $.validator, {
 			return val;
 		},
 
-		check: function( element ) {
+		check: function( element, silent ) {
 			element = this.validationTargetFor( this.clean( element ) );
 
 			var rules = $( element ).rules(),
@@ -760,7 +765,7 @@ $.extend( $.validator, {
 					}
 
 					if ( !result ) {
-						this.formatAndAdd( element, rule );
+						this.formatAndAdd( element, rule, silent );
 						return false;
 					}
 				} catch ( e ) {
@@ -840,7 +845,7 @@ $.extend( $.validator, {
 			return message;
 		},
 
-		formatAndAdd: function( element, rule ) {
+		formatAndAdd: function( element, rule, silent ) {
 			var message = this.defaultMessage( element, rule );
 
 			this.errorList.push( {
@@ -848,6 +853,10 @@ $.extend( $.validator, {
 				element: element,
 				method: rule.method
 			} );
+
+      if ( silent ) {
+        return;
+      }
 
 			this.errorMap[ element.name ] = message;
 			this.submitted[ element.name ] = message;

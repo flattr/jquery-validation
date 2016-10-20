@@ -33,7 +33,7 @@
 		"dist/jquery.validate.js",
 		"dist/jquery.validate.min.js"
 	],
-	"main": "dist/jquery.validate.js",
+	"main": "src/core.js",
 	"dependencies": {
 		"jquery": "^1.7 || ^2.0 || ^3.1"
 	},
