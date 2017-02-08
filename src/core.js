@@ -456,9 +456,17 @@ $.extend( $.validator, {
 				// If this element is grouped, then validate all group elements already
 				// containing a value
 				group = this.groups[ checkElement.name ];
+
+        var groupMembersCount = 0;
+        var submittedGroupMembers = 0;
 				if ( group ) {
 					$.each( this.groups, function( name, testgroup ) {
 						if ( testgroup === group && name !== checkElement.name ) {
+              groupMembersCount++;
+              if ( name in v.submitted ) {
+                submittedGroupMembers++;
+              }
+
 							cleanElement = v.validationTargetFor( v.clean( v.findByName( name ) ) );
 							if ( cleanElement && cleanElement.name in v.invalid ) {
 								v.currentElements.push( cleanElement );
@@ -470,6 +478,12 @@ $.extend( $.validator, {
 
 				rs = this.check( checkElement ) !== false;
 				result = result && rs;
+
+        // Do not show any errors if not all group fields has been submitted
+        if ( group && ( groupMembersCount !== submittedGroupMembers ) ) {
+          return;
+        }
+
 				if ( rs ) {
 					this.invalid[ checkElement.name ] = false;
 				} else {
